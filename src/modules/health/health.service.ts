@@ -6,7 +6,7 @@ import { firstValueFrom, catchError } from 'rxjs';
 @Injectable()
 export class HealthService {
   private readonly logger = new Logger(HttpService.name);
-  constructor(private readonly http: HttpService) {}
+  constructor(private readonly http: HttpService) { }
 
   getStatus() {
     return { status: 'ok', timestamp: new Date().toISOString() };
