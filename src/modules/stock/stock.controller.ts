@@ -12,10 +12,7 @@ export class StockController {
   }
 
   @Get(':symbol/history')
-  getHistory(
-    @Param('symbol') symbol: string,
-    @Query() query: HistoryQueryDto,
-  ) {
+  getHistory(@Param('symbol') symbol: string, @Query() query: HistoryQueryDto) {
     return this.stockService.fetchHistory(symbol, query.from, query.to);
   }
 }

@@ -13,9 +13,9 @@ export class HttpWrapperService {
 
   constructor(
     private readonly http: HttpService,
-    private readonly config: ConfigService
+    private readonly config: ConfigService,
   ) {
-    this.token = this.config.get("STOCK_API_KEY") || "";
+    this.token = this.config.get('STOCK_API_KEY') || '';
   }
 
   private async request<T>(
@@ -23,23 +23,23 @@ export class HttpWrapperService {
     url: string,
     options?: { params?: unknown; data?: unknown },
   ): Promise<Result<T, AxiosError>> {
-
     // attach token automatically on GET
     if (method === 'GET') {
-      options = { ...(options ?? {}), params: { ...(options?.params ?? {}), token: this.token } };
+      options = {
+        ...(options ?? {}),
+        params: { ...(options?.params ?? {}), token: this.token },
+      };
     }
 
     const promise: Promise<T> = firstValueFrom(
-      this.http
-        .request<T>({ method, url, ...options })
-        .pipe(
-          catchError((err: AxiosError) => {
-            // log and rethrow so that tryCatch can catch it
-            this.logger.error(err.response?.data || err.message);
-            throw err;
-          }),
-        ),
-    ).then(response => response.data);
+      this.http.request<T>({ method, url, ...options }).pipe(
+        catchError((err: AxiosError) => {
+          // log and rethrow so that tryCatch can catch it
+          this.logger.error(err.response?.data || err.message);
+          throw err;
+        }),
+      ),
+    ).then((response) => response.data);
 
     // Wrap it in your tryCatch helper
     return tryCatch<T, AxiosError>(promise);

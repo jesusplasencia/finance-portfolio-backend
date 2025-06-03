@@ -27,3 +27,4 @@ export class QuoteResponse {
   @IsNumber()
   t: number;
 }
+

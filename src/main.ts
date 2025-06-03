@@ -1,6 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -9,4 +12,12 @@ async function bootstrap() {
   );
   await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
 }
-bootstrap();
+
+// handle any errors from bootstrap:
+bootstrap().catch((err) => {
+  // log the error
+  // you can also use a logger here if you have one configured
+  console.error('Fatal error during bootstrap:', err);
+  // exit with failure
+  process.exit(1);
+});

@@ -11,22 +11,20 @@ import awsSecretsLoader from './config/aws-secrets.loader';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [awsSecretsLoader]
+      load: [awsSecretsLoader],
     }),
     HttpModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (cs: ConfigService) => ({
-        baseURL: cs.get("STOCK_API_BASE_URL") ?? STOCK_API_BASE_URL,
+        baseURL: cs.get(`${STOCK_API_BASE_URL}`) ?? STOCK_API_BASE_URL,
         timeout: 5000,
       }),
-      inject: [
-        ConfigService
-      ]
+      inject: [ConfigService],
     }),
     HealthModule,
-    StockModule
+    StockModule,
   ],
   providers: [HttpWrapperService],
-  exports: [HttpWrapperService]
+  exports: [HttpWrapperService],
 })
 export class AppModule {}
