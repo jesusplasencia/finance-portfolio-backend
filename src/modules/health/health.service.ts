@@ -1,16 +1,14 @@
-import { HttpService } from '@nestjs/axios';
 import {
   Injectable,
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { AxiosError } from 'axios';
-import { firstValueFrom, catchError } from 'rxjs';
+import { HttpWrapperService } from 'src/common/http-wrapper.service';
 
 @Injectable()
 export class HealthService {
-  private readonly logger = new Logger(HttpService.name);
-  constructor(private readonly http: HttpService) {}
+  private readonly logger = new Logger(HealthService.name);
+  constructor(private readonly http: HttpWrapperService) {}
 
   getStatus() {
     return { status: 'ok', timestamp: new Date().toISOString() };
@@ -18,15 +16,14 @@ export class HealthService {
 
   async probeExternal() {
     try {
-      const res = await firstValueFrom(
-        this.http.get('/quote', { params: { symbol: 'AAPL' } }).pipe(
-          catchError((error: AxiosError) => {
-            this.logger.error(error.response?.data);
-            throw new InternalServerErrorException('An error happened!');
-          }),
-        ),
-      );
-      return { externalApi: res.status === 200 ? 'reachable' : 'unreachable' };
+      const { data, error } = await this.http.get('/quote', {
+        params: { symbol: 'AAPL' },
+      });
+      if (error) {
+        this.logger.error(`fetchQuote failed: ${error.message}`);
+        throw new InternalServerErrorException('Unable to fetch quote');
+      }
+      return { externalApi: data ? 'reachable' : 'unreachable' };
     } catch {
       return { externalApi: 'unreachable' };
     }

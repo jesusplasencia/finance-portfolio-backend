@@ -8,6 +8,7 @@ export class StockController {
 
   @Get(':symbol/quote')
   getQuote(@Param('symbol') symbol: string) {
+    console.log('Fetching Quote');
     return this.stockService.fetchQuote(symbol);
   }
 
