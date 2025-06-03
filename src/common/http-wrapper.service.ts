@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -7,20 +7,22 @@ import { tryCatch, Result } from './result';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class HttpWrapperService {
+export class HttpWrapperService implements OnModuleInit {
   private readonly logger = new Logger(HttpWrapperService.name);
   private token: string;
 
   constructor(
     private readonly http: HttpService,
     private readonly config: ConfigService,
-  ) {
-    this.token = this.config.get('STOCK_API_KEY') || '';
+  ) {}
+
+  onModuleInit() {
+    this.token = this.config.get<string>('STOCK_API_KEY')!;
   }
 
   private async request<T>(
     method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
-    url: string,
+    endpoint: string,
     options?: { params?: unknown; data?: unknown },
   ): Promise<Result<T, AxiosError>> {
     // attach token automatically on GET
@@ -32,7 +34,7 @@ export class HttpWrapperService {
     }
 
     const promise: Promise<T> = firstValueFrom(
-      this.http.request<T>({ method, url, ...options }).pipe(
+      this.http.request<T>({ method, url: endpoint, ...options }).pipe(
         catchError((err: AxiosError) => {
           // log and rethrow so that tryCatch can catch it
           this.logger.error(err.response?.data || err.message);
@@ -45,23 +47,23 @@ export class HttpWrapperService {
     return tryCatch<T, AxiosError>(promise);
   }
 
-  get<T>(url: string, params?: unknown) {
-    return this.request<T>('GET', url, { params });
+  get<T>(endpoint: string, params?: unknown) {
+    return this.request<T>('GET', endpoint, { params });
   }
 
-  post<T>(url: string, data?: unknown) {
-    return this.request<T>('POST', url, { data });
+  post<T>(endpoint: string, data?: unknown) {
+    return this.request<T>('POST', endpoint, { data });
   }
 
-  put<T>(url: string, data?: unknown) {
-    return this.request<T>('PUT', url, { data });
+  put<T>(endpoint: string, data?: unknown) {
+    return this.request<T>('PUT', endpoint, { data });
   }
 
-  patch<T>(url: string, data?: unknown) {
-    return this.request<T>('PATCH', url, { data });
+  patch<T>(endpoint: string, data?: unknown) {
+    return this.request<T>('PATCH', endpoint, { data });
   }
 
-  delete<T>(url: string, params?: unknown) {
-    return this.request<T>('DELETE', url, { params });
+  delete<T>(endpoint: string, params?: unknown) {
+    return this.request<T>('DELETE', endpoint, { params });
   }
 }

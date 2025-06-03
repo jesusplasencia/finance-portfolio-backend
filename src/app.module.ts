@@ -1,30 +1,30 @@
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
-import { STOCK_API_BASE_URL } from './common/constants';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { HttpWrapperService } from './common/http-wrapper.service';
+import { ConfigModule } from '@nestjs/config';
 import { HealthModule } from './modules/health/health.module';
 import { StockModule } from './modules/stock/stock.module';
 import awsSecretsLoader from './config/aws-secrets.loader';
+import { SharedHttpModule } from './common/http.module';
+
+import * as Joi from 'joi';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [awsSecretsLoader],
-    }),
-    HttpModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: (cs: ConfigService) => ({
-        baseURL: cs.get(`${STOCK_API_BASE_URL}`) ?? STOCK_API_BASE_URL,
-        timeout: 5000,
+      envFilePath: ['.env'],
+      validationSchema: Joi.object({
+        PORT: Joi.number().default(3000),
+        AWS_REGION: Joi.string().required(),
+        STAGE: Joi.string()
+          .valid('local', 'dev', 'qa', 'preprod', 'prod')
+          .default('local'),
       }),
-      inject: [ConfigService],
+      expandVariables: true,
     }),
+    SharedHttpModule,
     HealthModule,
     StockModule,
   ],
-  providers: [HttpWrapperService],
-  exports: [HttpWrapperService],
 })
 export class AppModule {}

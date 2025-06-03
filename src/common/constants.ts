@@ -1,1 +1,2 @@
-export const STOCK_API_BASE_URL = 'https://finnhub.io/api/v1';
+export const STOCK_API_HOST = 'https://finnhub.io';
+export const STOCK_API_BASE_PATH = '/api/v1';
