@@ -3,12 +3,12 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AxiosError } from 'axios';
-import { tryCatch, Result } from './result';
+import { tryCatch, Result } from '../utils';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class HttpWrapperService implements OnModuleInit {
-  private readonly logger = new Logger(HttpWrapperService.name);
+export class HttpClientService implements OnModuleInit {
+  private readonly logger = new Logger(HttpClientService.name);
   private token: string;
 
   constructor(

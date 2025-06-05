@@ -3,12 +3,12 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { HttpWrapperService } from 'src/common/http-wrapper.service';
+import { HttpClientService } from 'src/common/http/http-client.service';
 
 @Injectable()
 export class HealthService {
   private readonly logger = new Logger(HealthService.name);
-  constructor(private readonly http: HttpWrapperService) {}
+  constructor(private readonly http: HttpClientService) {}
 
   getStatus() {
     return { status: 'ok', timestamp: new Date().toISOString() };

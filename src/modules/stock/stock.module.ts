@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { StockController } from './stock.controller';
 import { StockService } from './stock.service';
-import { SharedHttpModule } from 'src/common/http.module';
+import { HttpClientModule } from 'src/common/http';
 
 @Module({
-  imports: [SharedHttpModule],
+  imports: [HttpClientModule],
   controllers: [StockController],
   providers: [StockService],
 })

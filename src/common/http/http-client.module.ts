@@ -1,9 +1,9 @@
-// src/common/http.module.ts
+// src/common/http/http.module.ts
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { HttpWrapperService } from './http-wrapper.service';
-import { STOCK_API_HOST, STOCK_API_BASE_PATH } from './constants';
+import { HttpClientService } from './http-client.service';
+import { STOCK_API_HOST, STOCK_API_BASE_PATH } from './http.constants';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { STOCK_API_HOST, STOCK_API_BASE_PATH } from './constants';
       inject: [ConfigService],
     }),
   ],
-  providers: [HttpWrapperService],
-  exports: [HttpWrapperService],
+  providers: [HttpClientService],
+  exports: [HttpClientService],
 })
-export class SharedHttpModule {}
+export class HttpClientModule {}

@@ -3,18 +3,23 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { HttpWrapperService } from 'src/common/http-wrapper.service';
+import { HttpClientService } from 'src/common/http/http-client.service';
+import { mapError } from 'src/common/utils';
 
 @Injectable()
 export class StockService {
   private readonly logger = new Logger(StockService.name);
-  constructor(private readonly http: HttpWrapperService) {}
+  constructor(private readonly http: HttpClientService) {}
 
   async fetchQuote(symbol: string) {
     const { data, error } = await this.http.get('/quote', { symbol });
     if (error) {
-      this.logger.error(`fetchQuote failed: ${error.message}`);
-      throw new InternalServerErrorException('Unable to fetch quote');
+      const { statusCode, message } = mapError(error);
+      this.logger.error(`fetchQuote failed: ${message}`);
+      throw new InternalServerErrorException(message, {
+        cause: error,
+        description: `fetchQuote failed with status ${statusCode}`,
+      });
     }
     return data;
   }
@@ -32,8 +37,12 @@ export class StockService {
       },
     });
     if (error) {
-      this.logger.error(`fetchHistory failed: ${error.message}`);
-      throw new InternalServerErrorException('Unable to fetch history');
+      const { statusCode, message } = mapError(error);
+      this.logger.error(`fetchHistory failed: ${message}`);
+      throw new InternalServerErrorException(message, {
+        cause: error,
+        description: `fetchHistory failed with status ${statusCode}`,
+      });
     }
     return data;
   }

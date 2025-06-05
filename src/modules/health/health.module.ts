@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { HealthController } from './health.controller';
 import { HealthService } from './health.service';
-import { SharedHttpModule } from 'src/common/http.module';
+import { HttpClientModule } from 'src/common/http';
 
 @Module({
-  imports: [SharedHttpModule],
+  imports: [HttpClientModule],
   controllers: [HealthController],
   providers: [HealthService],
 })

@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { HealthModule } from './modules/health/health.module';
 import { StockModule } from './modules/stock/stock.module';
-import awsSecretsLoader from './config/aws-secrets.loader';
-import { SharedHttpModule } from './common/http.module';
+import { HttpClientModule } from './common/http/';
 
 import * as Joi from 'joi';
+import awsSecretsLoader from './common/config/aws-secrets.loader';
 
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import * as Joi from 'joi';
       }),
       expandVariables: true,
     }),
-    SharedHttpModule,
+    HttpClientModule,
     HealthModule,
     StockModule,
   ],
