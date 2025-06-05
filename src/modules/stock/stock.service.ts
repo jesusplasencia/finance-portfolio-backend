@@ -2,17 +2,32 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { HttpClientService } from 'src/common/http/http-client.service';
 import { mapError } from 'src/common/utils';
+import { DictionaryService } from '../dictionary';
 
 @Injectable()
 export class StockService {
   private readonly logger = new Logger(StockService.name);
-  constructor(private readonly http: HttpClientService) {}
+  constructor(
+    private readonly http: HttpClientService,
+    private readonly dict: DictionaryService,
+  ) {}
 
   async fetchQuote(symbol: string) {
-    const { data, error } = await this.http.get('/quote', { symbol });
+    // validate symbol first
+    if (!this.dict.exists(symbol)) {
+      throw new NotFoundException(
+        'Stock quote not available or symbol incorrect.',
+      );
+    }
+    // Get From Finhub
+    const { data, error } = await this.http.get('/quote', {
+      symbol: symbol.toUpperCase(),
+    });
+    // Catch Erros
     if (error) {
       const { statusCode, message } = mapError(error);
       this.logger.error(`fetchQuote failed: ${message}`);
